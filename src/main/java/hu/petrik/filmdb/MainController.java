@@ -31,32 +31,24 @@ public class MainController extends Controller {
     private TableColumn<Film, Integer> colHossz;
     @FXML
     private TableColumn<Film, Integer> colErtekeles;
+    private FilmDB db;
 
     public void initialize() {
         colCim.setCellValueFactory(new PropertyValueFactory<>("cim")); //a tárolt objektumban egy getCim függvényt fog keresni.
         colKategoria.setCellValueFactory(new PropertyValueFactory<>("kategoria"));
         colHossz.setCellValueFactory(new PropertyValueFactory<>("hossz"));
         colErtekeles.setCellValueFactory(new PropertyValueFactory<>("ertekeles"));
-        try{
-            FilmDB db = new FilmDB();
-            List<Film> filmList = db.getFilmek();
-            for (Film film: filmList) {
-                filmTable.getItems().add(film);
-            }
-        }catch (SQLException e) {
-            hibaKiir(e);
-        }
-
     }
 
     @FXML
-    public void onAddButtonClick(ActionEvent event) {
+    public void onAddButtonClick(ActionEvent actionEvent) {
         try {
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader(FilmApp.class.getResource("hozzaad-viev.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 320, 400);
             stage.setTitle("FilmDb");
             stage.setScene(scene);
+            stage.setOnCloseRequest(event -> filmListaFeltolt());
             stage.show();
         }
         catch (Exception e){
@@ -70,5 +62,18 @@ public class MainController extends Controller {
 
     @FXML
     public void onTorlesButtonClick(ActionEvent event) {
+    }
+
+    private void filmListaFeltolt() {
+
+        try{
+            List<Film> filmList = db.getFilmek();
+            filmTable.getItems().clear();
+            for (Film film: filmList) {
+                filmTable.getItems().add(film);
+            }
+        }catch (SQLException e) {
+            hibaKiir(e);
+        }
     }
 }
