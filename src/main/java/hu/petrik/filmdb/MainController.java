@@ -62,10 +62,28 @@ public class MainController extends Controller {
 
     @FXML
     public void onTorlesButtonClick(ActionEvent event) {
+        int selectedIndex = filmTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == -1) {
+            alert("A törléshez előbb válasszon ki egy elemet a táblázatból");
+            return;
+        }
+        Film torlendoFilm = filmTable.getSelectionModel().getSelectedItem();
+        if (!confirm("Biztos, hogy törölni szeretné az alábbi filmet:" + torlendoFilm.getCim())) {
+            return;
+        }
+        else {
+            try {
+                db.filmTorlese(torlendoFilm.getId());
+                alert("Sikeres törlés!");
+                filmListaFeltolt();
+            } catch (SQLException e) {
+                hibaKiir(e);
+            }
+        }
     }
 
-    private void filmListaFeltolt() {
 
+    private void filmListaFeltolt() {
         try{
             List<Film> filmList = db.getFilmek();
             filmTable.getItems().clear();

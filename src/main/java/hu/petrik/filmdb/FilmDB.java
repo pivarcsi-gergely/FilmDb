@@ -37,4 +37,13 @@ public class FilmDB {
         pStmt.setInt(4, ertekeles);
         return pStmt.executeUpdate();
     }
+
+    public boolean filmTorlese(int id) throws SQLException {
+        String sql = "DELETE FROM filmek WHERE id = ?";
+        PreparedStatement pStmt = DBconn.prepareStatement(sql);
+        pStmt.setInt(1, id);
+        int erintettSorok = pStmt.executeUpdate();
+        return erintettSorok == 1;
+
+    }
 }
