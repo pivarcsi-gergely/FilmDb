@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainController {
+public class MainController extends Controller {
 
     @FXML
     private TableView<Film> filmTable;
@@ -48,21 +48,6 @@ public class MainController {
         }
 
     }
-
-    private void hibaKiir(Exception e) {
-        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-        errorAlert.setTitle("Hiba!");
-        errorAlert.setHeaderText(e.getClass().toString());
-        errorAlert.setContentText(e.getMessage());
-        Timer alertTimer = new Timer();
-        alertTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> errorAlert.show());
-            }
-        }, 1000);
-    }
-
 
     @FXML
     public void onAddButtonClick(ActionEvent event) {

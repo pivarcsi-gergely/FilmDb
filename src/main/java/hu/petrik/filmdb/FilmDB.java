@@ -28,13 +28,13 @@ public class FilmDB {
         return filmek;
     }
 
-    public boolean filmHozzaadasa(String cim, String kategoria, int hossz, int ertekeles) throws SQLException {
+    public int filmHozzaadasa(String cim, String kategoria, int hossz, int ertekeles) throws SQLException {
         String sql = "INSERT INTO filmek(cim, kategoria, hossz, ertekeles) VALUES (?,?,?,?)";
         PreparedStatement pStmt = DBconn.prepareStatement(sql);
         pStmt.setString(1, cim);
         pStmt.setString(2, kategoria);
         pStmt.setInt(3, hossz);
         pStmt.setInt(4, ertekeles);
-        return pStmt.execute();
+        return pStmt.executeUpdate();
     }
 }
