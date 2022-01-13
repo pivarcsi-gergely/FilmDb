@@ -1,5 +1,9 @@
-package hu.petrik.filmdb;
+package hu.petrik.filmdb.controllers;
 
+import hu.petrik.filmdb.Controller;
+import hu.petrik.filmdb.Film;
+import hu.petrik.filmdb.FilmApp;
+import hu.petrik.filmdb.FilmDB;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -38,26 +42,43 @@ public class MainController extends Controller {
         colKategoria.setCellValueFactory(new PropertyValueFactory<>("kategoria"));
         colHossz.setCellValueFactory(new PropertyValueFactory<>("hossz"));
         colErtekeles.setCellValueFactory(new PropertyValueFactory<>("ertekeles"));
-    }
-
-    @FXML
-    public void onAddButtonClick(ActionEvent actionEvent) {
         try {
-            Stage stage = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(FilmApp.class.getResource("hozzaad-viev.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 320, 400);
-            stage.setTitle("FilmDb");
-            stage.setScene(scene);
-            stage.setOnCloseRequest(event -> filmListaFeltolt());
-            stage.show();
+            db = new FilmDB();
+            filmListaFeltolt();
         }
-        catch (Exception e){
+        catch (SQLException e) {
             hibaKiir(e);
         }
     }
 
     @FXML
-    public void onEditButtonClick(ActionEvent event) {
+    public void onAddButtonClick(ActionEvent actionEvent) {
+        try {
+            Controller hozzaadas = ujAblak("hozzaad-viev.fxml", "Film hozzáadása", 320, 400);
+            hozzaadas.getStage().setOnCloseRequest(event -> filmListaFeltolt());
+            hozzaadas.getStage().show();
+        } catch (Exception e) {
+            hibaKiir(e);
+        }
+    }
+
+    @FXML
+    public void onEditButtonClick(ActionEvent actionEvent) {
+        int selectedIndex = filmTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == -1) {
+            alert("A módosításhoz előbb válasszon ki egy elemet a táblázatból");
+            return;
+        }
+        Film modositandoFilm = filmTable.getSelectionModel().getSelectedItem();
+        try {
+            ModositController modositas = (ModositController) ujAblak("modosit-view.fxml", "Film módosítása", 320, 400);
+            modositas.setModositando(modositandoFilm);
+            modositas.getStage().setOnHiding(event -> filmTable.refresh());
+            modositas.getStage().setOnCloseRequest(event -> filmListaFeltolt());
+            modositas.getStage().show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -70,8 +91,7 @@ public class MainController extends Controller {
         Film torlendoFilm = filmTable.getSelectionModel().getSelectedItem();
         if (!confirm("Biztos, hogy törölni szeretné az alábbi filmet:" + torlendoFilm.getCim())) {
             return;
-        }
-        else {
+        } else {
             try {
                 db.filmTorlese(torlendoFilm.getId());
                 alert("Sikeres törlés!");
@@ -84,13 +104,13 @@ public class MainController extends Controller {
 
 
     private void filmListaFeltolt() {
-        try{
+        try {
             List<Film> filmList = db.getFilmek();
             filmTable.getItems().clear();
-            for (Film film: filmList) {
+            for (Film film : filmList) {
                 filmTable.getItems().add(film);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             hibaKiir(e);
         }
     }

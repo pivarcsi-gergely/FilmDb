@@ -1,5 +1,7 @@
-package hu.petrik.filmdb;
+package hu.petrik.filmdb.controllers;
 
+import hu.petrik.filmdb.Controller;
+import hu.petrik.filmdb.FilmDB;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -28,17 +30,15 @@ public class HozzaadController extends Controller {
             alert("Cím megadása kötelező.");
             return;
         }
-        if (kategoria.isEmpty()){
+        if (kategoria.isEmpty()) {
             alert("Kategória megadása kötelező.");
         }
-        try{
+        try {
             hossz = inputHossz.getValue();
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             alert("Hossz kiválasztása kötelező.");
             return;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             alert("A hossz csak 1 és 999 közötti szám lehet.");
             return;
         }
@@ -50,17 +50,15 @@ public class HozzaadController extends Controller {
 
         int ertekeles = inputErtekeles.getValue();
 
-        try{
+        try {
             FilmDB db = new FilmDB();
             int siker = db.filmHozzaadasa(cim, kategoria, hossz, ertekeles);
             if (siker == 1) {
                 alert("Film hozzáadása sikeres!");
-            }
-            else {
+            } else {
                 alert("Film hozzáadása sikertelen!");
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             hibaKiir(e);
         }
     }

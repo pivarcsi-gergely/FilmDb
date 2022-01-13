@@ -7,8 +7,8 @@ import java.util.List;
 public class FilmDB {
     Connection DBconn;
 
-    public FilmDB() throws SQLException{
-            DBconn = DriverManager.getConnection("jdbc:mysql://localhost:3306/filmdb", "root", "");
+    public FilmDB() throws SQLException {
+        DBconn = DriverManager.getConnection("jdbc:mysql://localhost:3306/filmdb", "root", "");
     }
 
     public List<Film> getFilmek() throws SQLException {
@@ -16,7 +16,7 @@ public class FilmDB {
         Statement stmt = DBconn.createStatement();
         String sql = "SELECT * FROM filmek";
         ResultSet result = stmt.executeQuery(sql);
-        while (result.next()){
+        while (result.next()) {
             int id = result.getInt("id");
             String cim = result.getString("cim");
             String kategoria = result.getString("kategoria");
@@ -44,6 +44,17 @@ public class FilmDB {
         pStmt.setInt(1, id);
         int erintettSorok = pStmt.executeUpdate();
         return erintettSorok == 1;
+    }
 
+    public boolean filmModositasa(Film modositando) throws SQLException {
+        String sql = "UPDATE filmek SET cim = ?, kategoria = ?, hossz = ?, ertekeles = ? WHERE id = ?";
+        PreparedStatement pStmt = DBconn.prepareStatement(sql);
+        pStmt.setString(1, modositando.getCim());
+        pStmt.setString(2, modositando.getKategoria());
+        pStmt.setInt(3, modositando.getHossz());
+        pStmt.setInt(4, modositando.getErtekeles());
+        pStmt.setInt(5, modositando.getId());
+        int erintettSorok = pStmt.executeUpdate();
+        return erintettSorok == 1;
     }
 }
