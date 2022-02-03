@@ -1,9 +1,8 @@
 package hu.petrik.filmdb.controllers;
 
-import hu.petrik.filmdb.Controller;
-import hu.petrik.filmdb.Film;
-import hu.petrik.filmdb.FilmApp;
-import hu.petrik.filmdb.FilmDB;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import hu.petrik.filmdb.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,11 +16,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static javafx.scene.input.KeyCode.T;
 
 public class MainController extends Controller {
 
@@ -42,13 +44,7 @@ public class MainController extends Controller {
         colKategoria.setCellValueFactory(new PropertyValueFactory<>("kategoria"));
         colHossz.setCellValueFactory(new PropertyValueFactory<>("hossz"));
         colErtekeles.setCellValueFactory(new PropertyValueFactory<>("ertekeles"));
-        try {
-            db = new FilmDB();
-            filmListaFeltolt();
-        }
-        catch (SQLException e) {
-            hibaKiir(e);
-        }
+        filmListaFeltolt();
     }
 
     @FXML
@@ -105,12 +101,22 @@ public class MainController extends Controller {
 
     private void filmListaFeltolt() {
         try {
-            List<Film> filmList = db.getFilmek();
-            filmTable.getItems().clear();
-            for (Film film : filmList) {
-                filmTable.getItems().add(film);
+            Response response = RequestHandler.get("http://localhost/14s/pgm/film_db_rest/api/film");
+            String json = response.getContent();
+            if (response.getResponseCode() >= 400) {
+                System.out.println(json);
+                return;
             }
-        } catch (SQLException e) {
+            else {
+                Gson Gayson = new Gson();
+                Type type = new TypeToken<List<Film>>(){}.getType();
+                List<Film> filmList = Gayson.fromJson(json, type);
+                filmTable.getItems().clear();
+                for (Film film : filmList) {
+                    filmTable.getItems().add(film);
+                }
+            }
+        } catch (IOException e) {
             hibaKiir(e);
         }
     }
