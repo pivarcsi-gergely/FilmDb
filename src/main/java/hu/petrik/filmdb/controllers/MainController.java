@@ -1,43 +1,22 @@
 package hu.petrik.filmdb.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import hu.petrik.filmdb.*;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static javafx.scene.input.KeyCode.T;
 
 public class MainController extends Controller {
 
-    @FXML
-    private TableView<Film> filmTable;
-    @FXML
-    private TableColumn<Film, String> colCim;
-    @FXML
-    private TableColumn<Film, String> colKategoria;
-    @FXML
-    private TableColumn<Film, Integer> colHossz;
-    @FXML
-    private TableColumn<Film, Integer> colErtekeles;
-    private FilmDB db;
+    @FXML private TableView<Film> filmTable;
+    @FXML private TableColumn<Film, String> colCim;
+    @FXML private TableColumn<Film, String> colKategoria;
+    @FXML private TableColumn<Film, Integer> colHossz;
+    @FXML private TableColumn<Film, Integer> colErtekeles;
 
     public void initialize() {
         colCim.setCellValueFactory(new PropertyValueFactory<>("cim")); //a tárolt objektumban egy getCim függvényt fog keresni.
@@ -89,10 +68,10 @@ public class MainController extends Controller {
             return;
         } else {
             try {
-                db.filmTorlese(torlendoFilm.getId());
-                alert("Sikeres törlés!");
+                boolean sikeres = FilmApi.filmTorlese(torlendoFilm.getId());
+                alert(sikeres ? "Sikeres törlés" : "Sikertelen törlés");
                 filmListaFeltolt();
-            } catch (SQLException e) {
+            } catch (IOException e) {
                 hibaKiir(e);
             }
         }
@@ -101,20 +80,10 @@ public class MainController extends Controller {
 
     private void filmListaFeltolt() {
         try {
-            Response response = RequestHandler.get("http://localhost/14s/pgm/film_db_rest/api/film");
-            String json = response.getContent();
-            if (response.getResponseCode() >= 400) {
-                System.out.println(json);
-                return;
-            }
-            else {
-                Gson Gayson = new Gson();
-                Type type = new TypeToken<List<Film>>(){}.getType();
-                List<Film> filmList = Gayson.fromJson(json, type);
-                filmTable.getItems().clear();
-                for (Film film : filmList) {
-                    filmTable.getItems().add(film);
-                }
+            List<Film> filmList = FilmApi.getFilmek();
+            filmTable.getItems().clear();
+            for (Film film : filmList) {
+                filmTable.getItems().add(film);
             }
         } catch (IOException e) {
             hibaKiir(e);

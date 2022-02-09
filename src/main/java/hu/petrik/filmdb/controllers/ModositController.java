@@ -2,14 +2,14 @@ package hu.petrik.filmdb.controllers;
 
 import hu.petrik.filmdb.Controller;
 import hu.petrik.filmdb.Film;
-import hu.petrik.filmdb.FilmDB;
+import hu.petrik.filmdb.FilmApi;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 
-import java.sql.SQLException;
+import java.io.IOException;
 
 public class ModositController extends Controller {
     @FXML
@@ -74,8 +74,8 @@ public class ModositController extends Controller {
         modositando.setErtekeles(ertekeles);
 
         try {
-            FilmDB db = new FilmDB();
-            if (db.filmModositasa(modositando)) {
+            Film modositottt = FilmApi.filmModositasa(modositando);
+            if (modositottt != null) {
                 alertWait("Sikeres módosítás");
                 this.stage.close();
             }
@@ -83,7 +83,7 @@ public class ModositController extends Controller {
                 alert("Sikertelen módosítás");
             }
         }
-        catch (SQLException e){
+        catch (IOException e){
             e.printStackTrace();
         }
     }

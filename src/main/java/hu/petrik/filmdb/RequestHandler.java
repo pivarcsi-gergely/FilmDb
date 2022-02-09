@@ -28,7 +28,7 @@ public class RequestHandler {
         return getResponse(httpConn);
     }
 
-    public static Response delete(String url, String body) throws IOException {
+    public static Response delete(String url) throws IOException {
         HttpURLConnection httpConn = setupConnection(url);
         httpConn.setRequestMethod("DELETE");
         return getResponse(httpConn);
